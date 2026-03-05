@@ -1,10 +1,10 @@
-import CharacterCard from "./CharacterCard";
+import DraggableCharacter from "./DraggableCharacter";
 
-export default function CharacterTray({ characters, placedIds = [] }) {
+export default function CharacterTray({ characters, placedIds }) {
   return (
     <div className="flex flex-wrap gap-3 justify-center p-4 bg-white/70 rounded-2xl border border-blue-100 shadow-sm max-w-lg">
       {characters.map((char) => (
-        <CharacterCard
+        <DraggableCharacter
           key={char.id}
           character={char}
           characters={characters}
