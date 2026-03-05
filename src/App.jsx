@@ -47,55 +47,72 @@ function GameScreen({ level, clearedLevels, onClear, onNext, onBack }) {
     onBack();
   };
 
-  // 클리어 시 부모에게 통보 (중복 방지)
+  const handleReset = () => resetGame();
+
   if (cleared && !clearedLevels.includes(level.id)) {
     onClear(level.id);
   }
 
+  const satisfiedCount = Object.entries(satisfactionMap).filter(([, results]) =>
+    results.every((r) => r.satisfied),
+  ).length;
+
   return (
     <DndContext sensors={sensors} onDragEnd={handleDragEnd}>
-      <div className="min-h-screen bg-blue-50 flex flex-col items-center justify-center gap-8 p-8">
+      <div className="min-h-screen bg-gradient-to-b from-blue-100 to-blue-50 flex flex-col items-center justify-center gap-6 p-8">
         {/* 헤더 */}
         <div className="text-center">
           <h1 className="text-3xl font-bold text-blue-400 mb-1">
             🧩 Is This Seat Taken?
           </h1>
-          <p className="text-slate-400 text-sm">
-            모두가 원하는 자리에 앉을 수 있도록 도와줘!
-          </p>
         </div>
 
-        {/* 레벨 정보 + 뒤로가기 */}
-        <div className="text-center relative w-full max-w-md">
+        {/* 레벨 정보 바 */}
+        <div className="flex items-center justify-between w-full max-w-md bg-white/80 rounded-2xl px-5 py-3 shadow-sm border border-blue-100">
           <button
             onClick={handleBack}
-            className="absolute left-0 top-1/2 -translate-y-1/2 text-sm text-slate-400 hover:text-slate-600 transition-colors"
+            className="text-sm text-slate-400 hover:text-slate-600 transition-colors font-medium"
           >
-            ← 레벨 선택
+            ← 뒤로
           </button>
-          <span className="text-xs font-semibold text-blue-300 uppercase tracking-widest">
-            Level {level.id}
+          <div className="text-center">
+            <p className="text-xs font-bold text-blue-300 uppercase tracking-widest">
+              Level {level.id}
+            </p>
+            <p className="text-sm font-bold text-slate-600">{level.title}</p>
+          </div>
+          <button
+            onClick={handleReset}
+            className="text-sm text-slate-400 hover:text-rose-400 transition-colors font-medium"
+            title="처음부터 다시"
+          >
+            ↺ 초기화
+          </button>
+        </div>
+
+        {/* 진행 상황 카운터 */}
+        <div className="flex items-center gap-3">
+          <p className="text-xs text-slate-400">{level.description}</p>
+          <span className="text-xs font-bold text-blue-400 bg-blue-100 px-2 py-0.5 rounded-full">
+            😊 {satisfiedCount} / {level.characters.length}
           </span>
-          <h2 className="text-xl font-bold text-slate-600 mt-1">
-            {level.title}
-          </h2>
-          <p className="text-sm text-slate-400 mt-1">{level.description}</p>
         </div>
 
         {/* 좌석 그리드 */}
-        <SeatGrid
-          seats={level.seats}
-          cols={level.cols}
-          seatMap={seatMap}
-          satisfactionMap={satisfactionMap}
-          onRemove={removeCharacter}
-        />
+        <div className="bg-white/60 p-6 rounded-3xl shadow-sm border border-blue-100">
+          <SeatGrid
+            seats={level.seats}
+            cols={level.cols}
+            seatMap={seatMap}
+            satisfactionMap={satisfactionMap}
+            onRemove={removeCharacter}
+          />
+        </div>
 
         {/* 캐릭터 트레이 */}
         <div className="flex flex-col items-center gap-2">
           <p className="text-xs text-slate-400">
-            캐릭터를 드래그해서 자리에 배치해줘 · 자리를 클릭하면 트레이로
-            돌아가
+            드래그해서 자리 배치 · 자리 클릭으로 트레이 복귀
           </p>
           <CharacterTray
             characters={level.characters}
@@ -138,9 +155,7 @@ export default function App() {
 
   const handleNext = (currentLevelId) => {
     const nextLevel = levels.find((l) => l.id === currentLevelId + 1);
-    if (nextLevel) {
-      setCurrentLevelId(nextLevel.id);
-    }
+    if (nextLevel) setCurrentLevelId(nextLevel.id);
   };
 
   const handleBack = () => {
