@@ -58,7 +58,7 @@ export default function App() {
 
         {/* 클리어 메시지 (임시) */}
         {cleared && (
-          <div className="px-6 py-3 bg-emerald-100 border border-emerald-300 rounded-2xl text-emerald-600 font-bold text-lg">
+          <div className="px-6 py-3 bg-emerald-100 border border-emerald-300 rounded-2xl text-emerald-600 font-bold text-lg animate-bounce">
             🎉 모두 만족했어! 레벨 클리어!
           </div>
         )}
@@ -78,7 +78,11 @@ export default function App() {
             캐릭터를 드래그해서 자리에 배치해줘 · 자리를 클릭하면 트레이로
             돌아가
           </p>
-          <CharacterTray characters={level.characters} placedIds={placedIds} />
+          <CharacterTray
+            characters={level.characters}
+            placedIds={placedIds}
+            satisfactionMap={satisfactionMap}
+          />
         </div>
       </div>
     </DndContext>

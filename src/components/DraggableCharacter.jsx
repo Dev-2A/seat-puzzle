@@ -5,6 +5,7 @@ export default function DraggableCharacter({
   character,
   characters,
   isPlaced,
+  satisfactionResults,
 }) {
   const { attributes, listeners, setNodeRef, transform, isDragging } =
     useDraggable({
@@ -28,6 +29,7 @@ export default function DraggableCharacter({
         character={character}
         characters={characters}
         isPlaced={isPlaced}
+        satisfactionResults={satisfactionResults}
       />
     </div>
   );
