@@ -8,10 +8,11 @@ import {
 import SeatGrid from "./components/SeatGrid";
 import CharacterTray from "./components/CharacterTray";
 import LevelSelect from "./components/LevelSelect";
+import ClearModal from "./components/ClearModal";
 import { levels } from "./data/levels";
 import { useGameState } from "./hooks/useGameState";
 
-function GameScreen({ level, onClear, onBack }) {
+function GameScreen({ level, clearedLevels, onClear, onNext, onBack }) {
   const {
     seatMap,
     placedIds,
@@ -19,6 +20,7 @@ function GameScreen({ level, onClear, onBack }) {
     removeCharacter,
     satisfactionMap,
     cleared,
+    resetGame,
   } = useGameState(level);
 
   const sensors = useSensors(
@@ -33,8 +35,22 @@ function GameScreen({ level, onClear, onBack }) {
     placeCharacter(over.id, character);
   };
 
-  // 클리어 감지 → 부모에게 알림
-  if (cleared) onClear(level.id);
+  const isLastLevel = level.id === levels[levels.length - 1].id;
+
+  const handleNext = () => {
+    resetGame();
+    onNext(level.id);
+  };
+
+  const handleBack = () => {
+    resetGame();
+    onBack();
+  };
+
+  // 클리어 시 부모에게 통보 (중복 방지)
+  if (cleared && !clearedLevels.includes(level.id)) {
+    onClear(level.id);
+  }
 
   return (
     <DndContext sensors={sensors} onDragEnd={handleDragEnd}>
@@ -52,7 +68,7 @@ function GameScreen({ level, onClear, onBack }) {
         {/* 레벨 정보 + 뒤로가기 */}
         <div className="text-center relative w-full max-w-md">
           <button
-            onClick={onBack}
+            onClick={handleBack}
             className="absolute left-0 top-1/2 -translate-y-1/2 text-sm text-slate-400 hover:text-slate-600 transition-colors"
           >
             ← 레벨 선택
@@ -65,13 +81,6 @@ function GameScreen({ level, onClear, onBack }) {
           </h2>
           <p className="text-sm text-slate-400 mt-1">{level.description}</p>
         </div>
-
-        {/* 클리어 메시지 */}
-        {cleared && (
-          <div className="px-6 py-3 bg-emerald-100 border border-emerald-300 rounded-2xl text-emerald-600 font-bold text-lg animate-bounce">
-            🎉 모두 만족했어! 레벨 클리어!
-          </div>
-        )}
 
         {/* 좌석 그리드 */}
         <SeatGrid
@@ -95,12 +104,22 @@ function GameScreen({ level, onClear, onBack }) {
           />
         </div>
       </div>
+
+      {/* 클리어 모달 */}
+      {cleared && (
+        <ClearModal
+          level={level}
+          isLastLevel={isLastLevel}
+          onNext={handleNext}
+          onBack={handleBack}
+        />
+      )}
     </DndContext>
   );
 }
 
 export default function App() {
-  const [screen, setScreen] = useState("select"); // "select" | "game"
+  const [screen, setScreen] = useState("select");
   const [currentLevelId, setCurrentLevelId] = useState(null);
   const [clearedLevels, setClearedLevels] = useState([]);
 
@@ -115,6 +134,13 @@ export default function App() {
     setClearedLevels((prev) =>
       prev.includes(levelId) ? prev : [...prev, levelId],
     );
+  };
+
+  const handleNext = (currentLevelId) => {
+    const nextLevel = levels.find((l) => l.id === currentLevelId + 1);
+    if (nextLevel) {
+      setCurrentLevelId(nextLevel.id);
+    }
   };
 
   const handleBack = () => {
@@ -135,7 +161,9 @@ export default function App() {
   return (
     <GameScreen
       level={currentLevel}
+      clearedLevels={clearedLevels}
       onClear={handleClear}
+      onNext={handleNext}
       onBack={handleBack}
     />
   );

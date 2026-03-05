@@ -25,15 +25,15 @@ export function useGameState(level) {
     });
   };
 
-  // 만족도 결과: { characterId, seatId, results[] }[]
   const satisfactionMap = useMemo(() => {
     const results = checkAllSatisfaction(seatMap, level.seats, level.cols);
-    // characterId → results 로 빠르게 조회할 수 있도록 변환
     return Object.fromEntries(results.map((r) => [r.characterId, r.results]));
   }, [seatMap, level]);
 
-  // 클리어 여부
   const cleared = useMemo(() => isLevelClear(seatMap, level), [seatMap, level]);
+
+  // 레벨 리셋 (다음 레벨 이동 시 호출)
+  const resetGame = () => setSeatMap({});
 
   return {
     seatMap,
@@ -42,5 +42,6 @@ export function useGameState(level) {
     removeCharacter,
     satisfactionMap,
     cleared,
+    resetGame,
   };
 }
