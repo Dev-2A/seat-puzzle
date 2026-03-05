@@ -1,9 +1,11 @@
+import { useState } from "react";
 import SeatGrid from "./components/SeatGrid";
 import CharacterTray from "./components/CharacterTray";
 import { levels } from "./data/levels";
 
 export default function App() {
   const level = levels[0];
+  const [placedIds, setPlacedIds] = useState([]); // 배치된 캐릭터 id 목록
 
   return (
     <div className="min-h-screen bg-blue-50 flex flex-col items-center justify-center gap-8 p-8">
@@ -32,7 +34,7 @@ export default function App() {
       {/* 캐릭터 트레이 */}
       <div className="flex flex-col items-center gap-2">
         <p className="text-xs text-slate-400">캐릭터를 자리에 배치해줘</p>
-        <CharacterTray characters={level.characters} />
+        <CharacterTray characters={level.characters} placedIds={placedIds} />
       </div>
     </div>
   );

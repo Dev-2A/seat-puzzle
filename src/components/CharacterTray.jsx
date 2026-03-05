@@ -1,21 +1,15 @@
-function CharacterCard({ character }) {
-  return (
-    <div className="flex flex-col items-center gap-1 cursor-grab">
-      <div className="w-14 h-14 rounded-full bg-white border-2 border-blue-200 flex items-center justify-center text-2xl shadow-sm">
-        {character.emoji}
-      </div>
-      <span className="text-xs text-slate-500 font-medium">
-        {character.name}
-      </span>
-    </div>
-  );
-}
+import CharacterCard from "./CharacterCard";
 
-export default function CharacterTray({ characters }) {
+export default function CharacterTray({ characters, placedIds = [] }) {
   return (
-    <div className="flex gap-4 p-4 bg-white rounded-2xl border border-blue-100 shadow-sm">
+    <div className="flex flex-wrap gap-3 justify-center p-4 bg-white/70 rounded-2xl border border-blue-100 shadow-sm max-w-lg">
       {characters.map((char) => (
-        <CharacterCard key={char.id} character={char} />
+        <CharacterCard
+          key={char.id}
+          character={char}
+          characters={characters}
+          isPlaced={placedIds.includes(char.id)}
+        />
       ))}
     </div>
   );
