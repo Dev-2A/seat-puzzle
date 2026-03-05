@@ -1,4 +1,3 @@
-import { useState } from "react";
 import {
   DndContext,
   PointerSensor,
@@ -12,13 +11,17 @@ import { useGameState } from "./hooks/useGameState";
 
 export default function App() {
   const level = levels[0];
-  const { seatMap, placedIds, placeCharacter, removeCharacter } =
-    useGameState(level);
+  const {
+    seatMap,
+    placedIds,
+    placeCharacter,
+    removeCharacter,
+    satisfactionMap,
+    cleared,
+  } = useGameState(level);
 
   const sensors = useSensors(
-    useSensor(PointerSensor, {
-      activationConstraint: { distance: 5 }, // 5px 이상 움직여야 드래그 시작
-    }),
+    useSensor(PointerSensor, { activationConstraint: { distance: 5 } }),
   );
 
   const handleDragEnd = (event) => {
@@ -53,11 +56,19 @@ export default function App() {
           <p className="text-sm text-slate-400 mt-1">{level.description}</p>
         </div>
 
+        {/* 클리어 메시지 (임시) */}
+        {cleared && (
+          <div className="px-6 py-3 bg-emerald-100 border border-emerald-300 rounded-2xl text-emerald-600 font-bold text-lg">
+            🎉 모두 만족했어! 레벨 클리어!
+          </div>
+        )}
+
         {/* 좌석 그리드 */}
         <SeatGrid
           seats={level.seats}
           cols={level.cols}
           seatMap={seatMap}
+          satisfactionMap={satisfactionMap}
           onRemove={removeCharacter}
         />
 
